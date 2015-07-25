@@ -1,6 +1,6 @@
 # SpongeCake plugin for CakePHP 3
 
-*Note: This plugin is currently in pre-alpha status and is unsupported.*
+*Note: This plugin is currently in pre-alpha development and is unsupported.*
 
 SpongeCake is a CakePHP 3 plugin for managing content.
 
