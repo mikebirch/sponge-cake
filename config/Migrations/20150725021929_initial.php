@@ -118,11 +118,96 @@ class Initial extends AbstractMigration
                 ]
             )
             ->create();
+        $table = $this->table('users', ['id' => false, 'primary_key' => ['id']]);
+        $table
+            ->addColumn('id', 'uuid', [
+                'default' => null,
+                'limit' => null,
+                'null' => false,
+            ])
+            ->addColumn('username', 'string', [
+                'default' => null,
+                'limit' => 64,
+                'null' => false,
+            ])
+            ->addColumn('email', 'string', [
+                'default' => null,
+                'limit' => 255,
+                'null' => false,
+            ])
+            ->addColumn('email_token', 'string', [
+                'default' => null,
+                'limit' => 64,
+                'null' => true,
+            ])
+            ->addColumn('email_verified', 'boolean', [
+                'default' => 0,
+                'limit' => null,
+                'null' => false,
+            ])
+            ->addColumn('email_token_expires', 'datetime', [
+                'default' => null,
+                'limit' => null,
+                'null' => true,
+            ])
+            ->addColumn('active', 'boolean', [
+                'default' => 0,
+                'limit' => null,
+                'null' => false,
+            ])
+            ->addColumn('password', 'string', [
+                'default' => null,
+                'limit' => 64,
+                'null' => false,
+            ])
+            ->addColumn('password_token', 'string', [
+                'default' => null,
+                'limit' => 64,
+                'null' => true,
+            ])
+            ->addColumn('password_token_expires', 'datetime', [
+                'default' => null,
+                'limit' => null,
+                'null' => true,
+            ])
+            ->addColumn('role', 'string', [
+                'default' => null,
+                'limit' => 32,
+                'null' => true,
+            ])
+            ->addColumn('is_admin', 'boolean', [
+                'default' => 0,
+                'limit' => null,
+                'null' => false,
+            ])
+            ->addColumn('last_login', 'datetime', [
+                'default' => null,
+                'limit' => null,
+                'null' => true,
+            ])
+            ->addColumn('created', 'datetime', [
+                'default' => null,
+                'limit' => null,
+                'null' => true,
+            ])
+            ->addColumn('modified', 'datetime', [
+                'default' => null,
+                'limit' => null,
+                'null' => true,
+            ])
+            ->addIndex(
+                [
+                    'username',
+                    'email',
+                ]
+            )
+            ->create();
     }
 
     public function down()
     {
         $this->dropTable('contents');
         $this->dropTable('profiles');
+        $this->dropTable('users');
     }
 }
