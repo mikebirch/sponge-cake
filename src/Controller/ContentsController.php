@@ -20,10 +20,9 @@ class ContentsController extends AppController
      * 
      * @return void
      */
-    public function initialize() {
-
+    public function initialize()
+    {
         parent::initialize();
-
     }
 
     /**
@@ -47,7 +46,7 @@ class ContentsController extends AppController
     /**
      * Default isAuthorized method
      * @param array $user
-     * @return boolean True if allowed
+     * @return bool True if allowed
      */
     public function isAuthorized($user = null)
     {
@@ -120,7 +119,8 @@ class ContentsController extends AppController
      * @param  int $id Content id
      * @return array 
      */
-    public function siblings($id) {
+    public function siblings($id)
+    {
         $siblings = $this->Contents
             ->find('children', ['for' => $id])
             ->find('threaded', [
@@ -208,7 +208,8 @@ class ContentsController extends AppController
      * @param  int $id Content id
      * @return void Redirects to admin_index 
      */
-    public function moveUp($id) {
+    public function moveUp($id)
+    {
         $content = $this->Contents->get($id);
         $this->Contents->moveUp($content);
         return $this->redirect(['action' => 'admin_index']);
@@ -219,7 +220,8 @@ class ContentsController extends AppController
      * @param  int $id Content id
      * @return void Redirects to admin_index 
      */
-    public function moveDown($id) {
+    public function moveDown($id)
+    {
         $content = $this->Contents->get($id);
         $this->Contents->moveDown($content);
         return $this->redirect(['action' => 'admin_index']);

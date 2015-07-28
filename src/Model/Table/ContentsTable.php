@@ -109,7 +109,8 @@ class ContentsTable extends Table
      * deletes and rebuilds the cache of paths for records in content table
      * @return void
      */
-    public function afterDelete() {
+    public function afterDelete()
+    {
         Cache::delete('pagesByPath');
         $this->cachePages();
     }
@@ -122,7 +123,8 @@ class ContentsTable extends Table
      * @param \Cake\Datasource\EntityInterface $entity The entity that is going to be saved
      * @return void
      */
-    public function afterSave(Event $event, Entity $entity, $options) {
+    public function afterSave(Event $event, Entity $entity, $options)
+    {
         if(!$entity->isNew()) {
             $this->_updatePath($entity->id, $entity);
             // update the path for child pages
@@ -165,10 +167,11 @@ class ContentsTable extends Table
      * with the "path" field as the key.
      * Stores the result in a cache file.
      * 
-     * @param  boolean $format whether to return or not
+     * @param  bool $format whether to return or not
      * @return array 
      */
-    public function cachePages($format = null) {
+    public function cachePages($format = null)
+    {
        
         $query = $this->find('all')
             ->select(['id', 'path', 'public', 'published'])
@@ -195,9 +198,10 @@ class ContentsTable extends Table
      * Updates the path field for record in the contents table to match the tree hierarchy
      * @param  int $id id of the record
      * @param \Cake\Datasource\EntityInterface $entity The entity that is going to be saved
-     * @return boolean  
+     * @return bool
      */
-    protected function _updatePath($id, Entity $entity) {
+    protected function _updatePath($id, Entity $entity)
+    {
         $path = '';
         $pages = $this->find('path', ['for' => $id]);
         foreach($pages as $page) {
@@ -215,7 +219,7 @@ class ContentsTable extends Table
      * 
      * @param \Cake\Datasource\EntityInterface $entity The entity that is going to be saved
      * @param  int $id id of the record
-     * @return boolean 
+     * @return bool
      */
     protected function _saveNoCallbacks($entity, $id)
     {

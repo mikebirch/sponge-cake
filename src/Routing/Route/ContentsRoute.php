@@ -16,9 +16,10 @@ class ContentsRoute extends Route {
      * false will be returned. 
      *
      * @param string $url The URL to attempt to parse.
-     * @return array|false Boolean false on failure, otherwise an array of parameters.
+     * @return array|bool Boolean false on failure, otherwise an array of parameters.
      */
-    public function parse($url) {
+    public function parse($url)
+    {
         
         if($url != '/') {
             $url = rtrim($url,'/');
