@@ -125,20 +125,22 @@ class ContentsTable extends Table
      */
     public function afterSave(Event $event, Entity $entity, $options)
     {
-        if(!$entity->isNew()) {
-            $this->_updatePath($entity->id, $entity);
-            // update the path for child pages
-            $children = $this
-                ->find('children', ['for' => $entity->id])
-                ->toArray();
-            foreach($children as $child) {
-                $this->_updatePath($child->id, $entity);           
+        if($entity->id != 1) { // don’t do anything when editing the home page 
+            if(!$entity->isNew()) { // only update when editing
+                $this->_updatePath($entity->id, $entity);
+                // update the path for child pages
+                $children = $this
+                    ->find('children', ['for' => $entity->id])
+                    ->toArray();
+                foreach($children as $child) {
+                    $this->_updatePath($child->id, $entity);           
+                }
+            } else {
+                $this->_updatePath($entity->id, $entity);
             }
-        } else {
-            $this->_updatePath($entity->id, $entity);
+            Cache::delete('pagesByPath');
+            $this->cachePages();
         }
-        Cache::delete('pagesByPath');
-        $this->cachePages();
     }
 
     /**
