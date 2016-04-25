@@ -152,7 +152,7 @@ class ContentsTable extends Table
      */
     public function findFullTreeList(Query $query, array $options)
     {
-        $results = $this->find('all')->toArray();
+        $results = $this->find('all', ['order' => 'lft ASC'])->toArray();
         $stack = [];
         foreach ($results as $i => $result) {
             while ($stack && ($stack[count($stack) - 1] < $result->rght)) {
