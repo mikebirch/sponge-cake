@@ -110,7 +110,11 @@ class ContentsController extends AppController
             $siblings = $this->siblings($content->parent_id);
         }
 
-        $this->set(compact('content', 'siblings'));
+        // breadcrumbs
+        $breadcrumbs = $this->Contents->find('path', ['for' => $content->id]);
+        $count_breadcrumbs = $breadcrumbs->count();
+
+        $this->set(compact('content', 'siblings', 'breadcrumbs', 'count_breadcrumbs'));
         $this->set('_serialize', ['content']);
     }
 
