@@ -113,8 +113,18 @@ class ContentsController extends AppController
         // breadcrumbs
         $breadcrumbs = $this->Contents->find('path', ['for' => $content->id]);
         $count_breadcrumbs = $breadcrumbs->count();
+        $breadcrumbs = $breadcrumbs->toArray();
 
-        $this->set(compact('content', 'siblings', 'breadcrumbs', 'count_breadcrumbs'));
+        // children (all children, $content->child_contents only goes down one level)
+        $children = $this->Contents
+            ->find('children', ['for' => $breadcrumbs[0]->id])
+            ->find('threaded', [
+                'fields' => ['id', 'slug', 'path', 'parent_id', 'nav', 'published', 'public'],
+                'order' => 'lft ASC'
+            ])
+            ->toArray();
+
+        $this->set(compact('content', 'siblings', 'breadcrumbs', 'count_breadcrumbs', 'children'));
         $this->set('_serialize', ['content']);
     }
 
