@@ -18,7 +18,7 @@ class ContentsRoute extends Route {
      * @param string $url The URL to attempt to parse.
      * @return array|bool Boolean false on failure, otherwise an array of parameters.
      */
-    public function parse($url)
+    public function parse($url, $method = '')
     {
         
         if($url != '/') {
