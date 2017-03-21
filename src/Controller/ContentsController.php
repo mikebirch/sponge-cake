@@ -73,7 +73,7 @@ class ContentsController extends AppController
      * @return void
      */
 
-    public function admin_index()
+    public function adminIndex()
     {
         $contents = $this->Contents->find('fullTreeList');
         $this->set('contents', $contents);
