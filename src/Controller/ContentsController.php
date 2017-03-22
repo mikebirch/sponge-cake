@@ -126,6 +126,9 @@ class ContentsController extends AppController
 
         $this->set(compact('content', 'siblings', 'breadcrumbs', 'count_breadcrumbs', 'children'));
         $this->set('_serialize', ['content']);
+        if($path == '/') {
+            $this->set('bodyclass', 'home');
+        }
     }
 
     /**
