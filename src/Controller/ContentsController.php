@@ -6,6 +6,7 @@ use Cake\Event\Event;
 use Cake\ORM\TableRegistry;
 use Cake\Cache\Cache;
 use Cake\Network\Session;
+use Cake\Network\Exception\NotFoundException;
 
 /**
  * Contents Controller
