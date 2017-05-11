@@ -228,7 +228,11 @@ class ContentsController extends AppController
     public function moveUp($id)
     {
         $content = $this->Contents->get($id);
-        $this->Contents->moveUp($content);
+        if ($this->Contents->moveUp($content)) {
+            $this->Flash->success('The page has been moved up.');
+        } else {
+            $this->Flash->error('The page could not be moved up. Please, try again.');
+        }
         return $this->redirect(['action' => 'admin_index']);
     }
 
@@ -240,7 +244,11 @@ class ContentsController extends AppController
     public function moveDown($id)
     {
         $content = $this->Contents->get($id);
-        $this->Contents->moveDown($content);
+        if ($this->Contents->moveDown($content)) {
+            $this->Flash->success('The page has been moved down.');
+        } else {
+            $this->Flash->error('The page could not be moved down. Please, try again.');
+        }
         return $this->redirect(['action' => 'admin_index']);
     }
 }
