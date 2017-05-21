@@ -105,6 +105,48 @@ class ContentsTable extends Table
         return $rules;
     }
 
+
+    public function findPage(Query $query, array $options) {
+        $query = $this->find()
+            ->where(['Contents.path' => $options['path']])
+            ->contain([
+                    'ParentContents' => ['fields' => ['id', 'slug', 'path', 'parent_id', 'nav']],
+                    'ChildContents' => ['fields' => ['id', 'slug', 'path', 'parent_id', 'nav', 'published', 'public'],'conditions' => ['published' => 1]]
+                ]);
+        $query->cache(function ($q) {
+            return 'contents-' . md5(serialize($q->clause('where')));
+        });
+        return $query->firstOrFail();;
+    }
+
+    public function findBreadcrumbs(Query $query, array $options) {
+        $breadcrumbs = Cache::read($options['id'] . '_breadcrumbs');
+        $count_breadcrumbs = Cache::read($options['id'] . '_count_breadcrumbs');
+        if ($breadcrumbs === false || $count_breadcrumbs === false) {
+            $breadcrumbs = $this->find('path', ['for' => $options['id']]);
+            $crumbs = $breadcrumbs->toArray();
+            $count_breadcrumbs = $breadcrumbs->count();
+            Cache::write($options['id'] . '_breadcrumbs', $crumbs);
+            Cache::write($options['id'] . '_count_breadcrumbs', $count_breadcrumbs);
+        }
+        return [$breadcrumbs, $count_breadcrumbs];
+    }
+
+    public function findAllchildren(Query $query, array $options) {
+       
+        $children = Cache::read($options['id'] . '_children');
+        if ($children === false) {
+            $children = $this->find('children', ['for' => $options['id']])
+                ->find('threaded', [
+                    'fields' => ['id', 'slug', 'path', 'parent_id', 'nav', 'published', 'public'],
+                    'order' => 'lft ASC'
+                ])
+            ->toArray();
+            Cache::write($options['id'] . '_children', $children);
+        }
+        return $children;
+    }
+
     /**
      * deletes and rebuilds the cache of paths for records in content table
      * @return void
@@ -230,4 +272,6 @@ class ContentsTable extends Table
         $entity->clean();
         return $result ? $entity : false;
     }
+
+
 }

@@ -78,7 +78,6 @@ class ContentsController extends AppController
     {
         $contents = $this->Contents->find('fullTreeList');
         $this->set('contents', $contents);
-        $this->set('_serialize', ['contents']);
     }
 
     /**
@@ -98,59 +97,13 @@ class ContentsController extends AppController
                 throw new NotFoundException();
             }   
         }
-        $content = $this->Contents
-            ->find('all', ['conditions' => ['Contents.path' => $path]])
-            ->contain([
-                    'ParentContents' => ['fields' => ['id', 'slug', 'path', 'parent_id', 'nav']],
-                    'ChildContents' => ['fields' => ['id', 'slug', 'path', 'parent_id', 'nav', 'published', 'public'],'conditions' => ['published' => 1]]
-                ])
-            ->firstOrFail();
 
-        $siblings = null;
-        if($content->parent_id) {
-            $siblings = $this->siblings($content->parent_id);
-        }
+        $content = $this->Contents->find('page', ['path' => $path]);
+        list($breadcrumbs, $count_breadcrumbs) = $this->Contents->find('breadcrumbs', ['id' => $content->id]);
 
-        // breadcrumbs
-        $breadcrumbs = $this->Contents->find('path', ['for' => $content->id]);
-        $count_breadcrumbs = $breadcrumbs->count();
-        $breadcrumbs = $breadcrumbs->toArray();
-
-        // children (all children, $content->child_contents only goes down one level)
-        $children = $this->Contents
-            ->find('children', ['for' => $breadcrumbs[0]->id])
-            ->find('threaded', [
-                'fields' => ['id', 'slug', 'path', 'parent_id', 'nav', 'published', 'public'],
-                'order' => 'lft ASC'
-            ])
-            ->toArray();
-
-        $this->set(compact('content', 'siblings', 'breadcrumbs', 'count_breadcrumbs', 'children'));
-        $this->set('_serialize', ['content']);
+        $this->set(compact('content', 'breadcrumbs', 'count_breadcrumbs'));
         if($path == '/') {
             $this->set('bodyclass', 'home');
-        }
-    }
-
-    /**
-     * Finds siblings for a record in the contents table
-     * @param  int $id Content id
-     * @return array 
-     */
-    public function siblings($id)
-    {
-        $siblings = $this->Contents
-            ->find('children', ['for' => $id])
-            ->find('threaded', [
-                'fields' => ['id', 'slug', 'path', 'parent_id', 'nav', 'published', 'public'],
-                'conditions' => ['Contents.published' => 1]
-            ])
-            ->toArray();
-        if ($this->request->is('requested')) {
-            $this->response->body($siblings);
-            return $this->response;
-        } else {
-            return $siblings;
         }
     }
 
@@ -173,7 +126,6 @@ class ContentsController extends AppController
         }
         $parents = $this->Contents->find('treeList', ['spacer' => '_', 'valuePath' => 'nav']);
         $this->set(compact('content', 'parents'));
-        $this->set('_serialize', ['content']);
     }
 
     /**
@@ -199,7 +151,6 @@ class ContentsController extends AppController
         }
         $parents = $this->Contents->find('treeList', ['spacer' => '_', 'valuePath' => 'nav']);
         $this->set(compact('content', 'parents'));
-        $this->set('_serialize', ['content']);
     }
 
     /**
