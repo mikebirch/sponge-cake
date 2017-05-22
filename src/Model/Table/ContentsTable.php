@@ -113,8 +113,8 @@ class ContentsTable extends Table
                     'ParentContents' => ['fields' => ['id', 'slug', 'path', 'parent_id', 'nav']],
                     'ChildContents' => ['fields' => ['id', 'slug', 'path', 'parent_id', 'nav', 'published', 'public'],'conditions' => ['published' => 1]]
                 ]);
-        $query->cache(function ($q) {
-            return 'contents-' . md5(serialize($q->clause('where')));
+        $query->cache(function ($q) use ($options){
+            return 'contents-' . md5($options['path']);
         });
         return $query->firstOrFail();;
     }
@@ -151,8 +151,9 @@ class ContentsTable extends Table
      * deletes and rebuilds the cache of paths for records in content table
      * @return void
      */
-    public function afterDelete()
+    public function afterDelete(Event $event, $entity, $options)
     {
+        Cache::delete('contents-' .  md5($entity->path));
         Cache::delete('pagesByPath');
         $this->cachePages();
     }
@@ -167,6 +168,7 @@ class ContentsTable extends Table
      */
     public function afterSave(Event $event, Entity $entity, $options)
     {
+        Cache::delete('contents-' .  md5($entity->path));
         if($entity->id != 1) { // don’t do anything when editing the home page 
             if(!$entity->isNew()) { // only update when editing
                 $this->_updatePath($entity->id, $entity);
