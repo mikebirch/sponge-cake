@@ -24,6 +24,7 @@ class ContentsController extends AppController
     public function initialize()
     {
         parent::initialize();
+        $this->loadComponent('RequestHandler');
     }
 
     /**
@@ -37,7 +38,7 @@ class ContentsController extends AppController
     {
         if($this->request->params['action'] == 'display') {
             // allow users to view pages only if the page is "public" or the user is logged in
-            if(($this->request->params['pass']['public'] == true) || $this->Auth->user()) {
+            if(($this->request->params['public'] == true) || $this->Auth->user()) {
                 $this->Auth->allow(['display']);
             } 
         }
@@ -88,9 +89,9 @@ class ContentsController extends AppController
      * @throws \Cake\Network\Exception\NotFoundException When the record is not published and 
      * the user doesn't have the admin role
      */
-    public function display($path)
+    public function display()
     {
-        if($this->request->params['pass']['published'] == false) {
+        if($this->request->params['published'] == false) {
             if($this->Auth->user('role') == 'admin') {
                 $this->Flash->error(__('This page is not published and can only be viewed by administrators.'));
             } else {
@@ -98,13 +99,14 @@ class ContentsController extends AppController
             }   
         }
 
-        $content = $this->Contents->find('page', ['path' => $path]);
+        $content = $this->Contents->find('page', ['path' => $this->request->params['path']]);
         list($breadcrumbs, $count_breadcrumbs) = $this->Contents->find('breadcrumbs', ['id' => $content->id]);
 
         $this->set(compact('content', 'breadcrumbs', 'count_breadcrumbs'));
-        if($path == '/') {
+        if($this->request->params['path'] == '/') {
             $this->set('bodyclass', 'home');
         }
+
     }
 
     /**

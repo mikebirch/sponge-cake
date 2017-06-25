@@ -40,11 +40,9 @@ class ContentsRoute extends Route {
         }
         
         if (isset($pagesByPath[$url])) {
-            $params['pass'] = [
-                'path' => $url, 
-                'public' => $pagesByPath[$url]['public'],
-                'published' => $pagesByPath[$url]['published']
-            ];
+            $params['path'] = $url;
+            $params['public'] = $pagesByPath[$url]['public'];
+            $params['published'] = $pagesByPath[$url]['published'];
             return $params;
         }
 
