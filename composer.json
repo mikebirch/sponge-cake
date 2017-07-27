@@ -5,7 +5,7 @@
     "require": {
         "php": ">=5.5.9",
         "cakephp/cakephp": "3.3.*",
-        "burzum/cakephp-user-tools": "~1.0",
+        "burzum/cakephp-user-tools": "1.0.8",
         "dereuromark/cakephp-tools": "1.*"
     },
     "require-dev": {
