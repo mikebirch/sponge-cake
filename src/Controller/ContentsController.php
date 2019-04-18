@@ -18,7 +18,7 @@ class ContentsController extends AppController
 
     /**
      * Initialization hook method.
-     * 
+     *
      * @return void
      */
     public function initialize()
@@ -30,7 +30,7 @@ class ContentsController extends AppController
     /**
      * If the action is "display", $this->request->params['pass']['public'] variable 
      * is checked to set $this->Auth->allow for "public" pages
-     * 
+     *
      * @param Event $event An Event instance
      * @return void
      */
@@ -44,7 +44,7 @@ class ContentsController extends AppController
         }
         parent::beforeFilter($event);
     }
-    
+
     /**
      * Default isAuthorized method
      * @param array $user
@@ -54,7 +54,7 @@ class ContentsController extends AppController
     {
         $action = $this->request->params['action'];
 
-        if(in_array($action, ['siblings'])) {           
+        if(in_array($action, ['siblings'])) {
             return true;
         }
 
@@ -86,7 +86,7 @@ class ContentsController extends AppController
      *
      * @param string $path Content path.
      * @return void
-     * @throws \Cake\Network\Exception\NotFoundException When the record is not published and 
+     * @throws \Cake\Network\Exception\NotFoundException When the record is not published and
      * the user doesn't have the admin role
      */
     public function display()
@@ -96,7 +96,7 @@ class ContentsController extends AppController
                 $this->Flash->error(__('This page is not published and can only be viewed by administrators.'));
             } else {
                 throw new NotFoundException();
-            }   
+            }
         }
 
         $content = $this->Contents->find('page', ['path' => $this->request->params['path']]);
@@ -177,7 +177,7 @@ class ContentsController extends AppController
     /**
      * Moves a record up the tree
      * @param  int $id Content id
-     * @return void Redirects to admin_index 
+     * @return void Redirects to admin_index
      */
     public function moveUp($id)
     {
@@ -193,7 +193,7 @@ class ContentsController extends AppController
     /**
      * Moves a record down the tree
      * @param  int $id Content id
-     * @return void Redirects to admin_index 
+     * @return void Redirects to admin_index
      */
     public function moveDown($id)
     {

@@ -57,33 +57,33 @@ class ContentsTable extends Table
         $validator
             ->add('id', 'valid', ['rule' => 'numeric'])
             ->allowEmpty('id', 'create');
-            
+
         $validator
             ->add('lft', 'valid', ['rule' => 'numeric'])
             ->allowEmpty('lft');
-            
+
         $validator
             ->add('rght', 'valid', ['rule' => 'numeric'])
             ->allowEmpty('rght');
-            
+
         $validator
             ->allowEmpty('description');
-            
+
         $validator
             ->requirePresence('nav', 'create')
             ->notEmpty('nav');
-            
+
         $validator
             ->requirePresence('title', 'create')
             ->notEmpty('title');
-            
+
         $validator
             ->allowEmpty('sidebar');
-            
+
         $validator
             ->requirePresence('body', 'create')
             ->notEmpty('body');
-            
+
         $validator
             ->add('published', 'valid', ['rule' => 'boolean'])
             ->requirePresence('published', 'create')
@@ -133,7 +133,7 @@ class ContentsTable extends Table
     }
 
     public function findAllchildren(Query $query, array $options) {
-       
+
         $children = Cache::read($options['id'] . '_children');
         if ($children === false) {
             $children = $this->find('children', ['for' => $options['id']])
@@ -161,7 +161,7 @@ class ContentsTable extends Table
     /**
      * Updates the paths for each record in the contents table
      * and updates the cache file of paths.
-     * 
+     *
      * @param \Cake\Event\Event $event The afterSave event that was fired
      * @param \Cake\Datasource\EntityInterface $entity The entity that is going to be saved
      * @return void
@@ -169,7 +169,7 @@ class ContentsTable extends Table
     public function afterSave(Event $event, Entity $entity, $options)
     {
         Cache::delete('contents-' .  md5($entity->path));
-        if($entity->id != 1) { // don’t do anything when editing the home page 
+        if($entity->id != 1) { // don’t do anything when editing the home page
             if(!$entity->isNew()) { // only update when editing
                 $this->_updatePath($entity->id, $entity);
                 // update the path for child pages
@@ -177,7 +177,7 @@ class ContentsTable extends Table
                     ->find('children', ['for' => $entity->id])
                     ->toArray();
                 foreach($children as $child) {
-                    $this->_updatePath($child->id, $entity);           
+                    $this->_updatePath($child->id, $entity);
                 }
             } else {
                 $this->_updatePath($entity->id, $entity);
@@ -209,16 +209,16 @@ class ContentsTable extends Table
     }
 
     /**
-     * Finds all records in contents table and formats the results 
+     * Finds all records in contents table and formats the results
      * with the "path" field as the key.
      * Stores the result in a cache file.
-     * 
+     *
      * @param  bool $format whether to return or not
-     * @return array 
+     * @return array
      */
     public function cachePages($format = null)
     {
-       
+
         $query = $this->find('all')
             ->select(['id', 'path', 'public', 'published'])
             ->toArray();
@@ -227,7 +227,7 @@ class ContentsTable extends Table
 
         foreach($query as $page) {
             $pagesByPath[$page->path] = [
-                'id' => $page->id, 
+                'id' => $page->id,
                 'public' => $page->public,
                 'published' => $page->published,
             ];
@@ -262,7 +262,7 @@ class ContentsTable extends Table
     /**
      * saves a record without the afterSave callback firing
      * from https://github.com/cakephp/cakephp/issues/6006#issuecomment-106969296
-     * 
+     *
      * @param \Cake\Datasource\EntityInterface $entity The entity that is going to be saved
      * @param  int $id id of the record
      * @return bool
