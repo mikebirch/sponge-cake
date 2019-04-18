@@ -28,7 +28,7 @@ class ContentsController extends AppController
     }
 
     /**
-     * If the action is "display", $this->request->params['pass']['public'] variable 
+     * If the action is "display", $this->request->getParam['pass']['public'] variable
      * is checked to set $this->Auth->allow for "public" pages
      *
      * @param Event $event An Event instance
@@ -36,11 +36,11 @@ class ContentsController extends AppController
      */
     public function beforeFilter(Event $event)
     {
-        if($this->request->params['action'] == 'display') {
+        if($this->request->getParam('action') == 'display') {
             // allow users to view pages only if the page is "public" or the user is logged in
-            if(($this->request->params['public'] == true) || $this->Auth->user()) {
+            if(($this->request->getParam('public') == true) || $this->Auth->user()) {
                 $this->Auth->allow(['display']);
-            } 
+            }
         }
         parent::beforeFilter($event);
     }
@@ -52,7 +52,7 @@ class ContentsController extends AppController
      */
     public function isAuthorized($user = null)
     {
-        $action = $this->request->params['action'];
+        $action = $this->request->getParam('action');
 
         if(in_array($action, ['siblings'])) {
             return true;
@@ -91,7 +91,7 @@ class ContentsController extends AppController
      */
     public function display()
     {
-        if($this->request->params['published'] == false) {
+        if($this->request->getParam('published') == false) {
             if($this->Auth->user('role') == 'admin') {
                 $this->Flash->error(__('This page is not published and can only be viewed by administrators.'));
             } else {
@@ -99,11 +99,11 @@ class ContentsController extends AppController
             }
         }
 
-        $content = $this->Contents->find('page', ['path' => $this->request->params['path']]);
+        $content = $this->Contents->find('page', ['path' => $this->request->getParam('path')]);
         list($breadcrumbs, $count_breadcrumbs) = $this->Contents->find('breadcrumbs', ['id' => $content->id]);
 
         $this->set(compact('content', 'breadcrumbs', 'count_breadcrumbs'));
-        if($this->request->params['path'] == '/') {
+        if($this->request->getParam('path') == '/') {
             $this->set('bodyclass', 'home');
         }
 

@@ -30,9 +30,9 @@ class ContentsTable extends Table
      */
     public function initialize(array $config)
     {
-        $this->table('contents');
-        $this->displayField('title');
-        $this->primaryKey('id');
+        $this->setTable('contents');
+        $this->getDisplayField('title');
+        $this->setPrimaryKey('id');
         $this->addBehavior('Timestamp');
         $this->addBehavior('Tree');
         $this->addBehavior('Tools.Slugged', ['label' => 'title', 'unique' => true, 'case' => 'low']);
