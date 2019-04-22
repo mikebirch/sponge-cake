@@ -46,30 +46,6 @@ class ContentsController extends AppController
     }
 
     /**
-     * Default isAuthorized method
-     * @param array $user
-     * @return bool True if allowed
-     */
-    public function isAuthorized($user = null)
-    {
-        $action = $this->request->getParam('action');
-
-        if(in_array($action, ['siblings'])) {
-            return true;
-        }
-
-        if (in_array($action, ['moveUp', 'moveDown'])) {
-            return (bool)($user['role'] === 'admin');
-        }
-
-        if (in_array($action, ['add'])) {
-            return (bool)($user['is_admin']);
-        }
-
-        return parent::isAuthorized($user);
-    }
-
-    /**
      * Index method
      *
      * @return void
@@ -204,5 +180,10 @@ class ContentsController extends AppController
             $this->Flash->error('The page could not be moved down. Please, try again.');
         }
         return $this->redirect(['action' => 'admin_index']);
+    }
+
+    public function dashboard()
+    {
+
     }
 }
