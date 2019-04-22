@@ -3,10 +3,9 @@
     "description": "SpongeCake plugin for CakePHP",
     "type": "cakephp-plugin",
     "require": {
-        "php": ">=5.5.9",
-        "cakephp/cakephp": "3.3.*",
-        "burzum/cakephp-user-tools": "1.0.8",
-        "dereuromark/cakephp-tools": "1.*"
+        "cakephp/cakephp": "3.6.*",
+        "dereuromark/cakephp-tools": "1.9.0",
+        "cakedc/users": "8.1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "*"
