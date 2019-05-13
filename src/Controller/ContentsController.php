@@ -94,7 +94,7 @@ class ContentsController extends AppController
     {
         $content = $this->Contents->newEntity();
         if ($this->request->is('post')) {
-            $content = $this->Contents->patchEntity($content, $this->request->data);
+            $content = $this->Contents->patchEntity($content, $this->request->getData());
             if ($this->Contents->save($content)) {
                 $this->Flash->success(__('The content has been saved.'));
                 return $this->redirect(['action' => 'admin_index']);
@@ -119,7 +119,7 @@ class ContentsController extends AppController
             'contain' => []
         ]);
         if ($this->request->is(['patch', 'post', 'put'])) {
-            $content = $this->Contents->patchEntity($content, $this->request->data);
+            $content = $this->Contents->patchEntity($content, $this->request->getData());
             if ($this->Contents->save($content)) {
                 $this->Flash->success(__('The content has been saved.'));
                 return $this->redirect(['action' => 'admin_index']);
