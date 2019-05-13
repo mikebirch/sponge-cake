@@ -269,7 +269,7 @@ class ContentsTable extends Table
      */
     protected function _saveNoCallbacks($entity, $id)
     {
-        $dirtyFields = $entity->extract($this->schema()->columns(), true);
+        $dirtyFields = $entity->extract($this->getSchema()->columns(), true);
         $result = (boolean) $this->updateAll($dirtyFields, ['id' => $id]);
         $entity->clean();
         return $result ? $entity : false;
