@@ -3,28 +3,28 @@ namespace SpongeCake\Routing\Route;
 
 use Cake\Routing\Route\Route;
 use Cake\Cache\Cache;
-use Cake\ORM\TableRegistry;
-use Cake\Core\Configure;
-use Cake\Core\Configure\Engine\PhpConfig;
+use Cake\ORM\Locator\LocatorAwareTrait;
 
 class ContentsRoute extends Route {
+
+    use LocatorAwareTrait;
 
     /**
      * Checks to see if the given URL matches a path in the contents table.
      *
      * If the route can be parsed an array of parameters will be returned; if not
-     * false will be returned. 
+     * false will be returned.
      *
      * @param string $url The URL to attempt to parse.
      * @return array|bool Boolean false on failure, otherwise an array of parameters.
      */
     public function parse($url, $method = '')
     {
-        
+
         if($url != '/') {
             $url = rtrim($url,'/');
         }
-        
+
         $params = parent::parse($url);
         if (!($params)) {
             return false;
@@ -33,12 +33,10 @@ class ContentsRoute extends Route {
         $pagesByPath = Cache::read('pagesByPath');
 
         if ($pagesByPath === false) {
-            $contents = TableRegistry::get('Contents', [
-                'className' => 'SpongeCake\Model\Table\ContentsTable'
-            ]);
+            $contents = $this->getTableLocator()->get('SpongeCake.Contents');
             $pagesByPath = $contents->cachePages(true);
         }
-        
+
         if (isset($pagesByPath[$url])) {
             $params['path'] = $url;
             $params['public'] = $pagesByPath[$url]['public'];

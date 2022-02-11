@@ -3,10 +3,10 @@ namespace SpongeCake\Controller;
 
 use SpongeCake\Controller\AppController;
 use Cake\Event\Event;
-use Cake\ORM\TableRegistry;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\Cache\Cache;
 use Cake\Network\Session;
-use Cake\Network\Exception\NotFoundException;
+use Cake\Http\Exception\NotFoundException;
 
 /**
  * Contents Controller

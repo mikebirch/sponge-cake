@@ -56,38 +56,38 @@ class ContentsTable extends Table
     {
         $validator
             ->add('id', 'valid', ['rule' => 'numeric'])
-            ->allowEmpty('id', 'create');
+            ->allowEmptyString('create', 'id');
 
         $validator
             ->add('lft', 'valid', ['rule' => 'numeric'])
-            ->allowEmpty('lft');
+            ->allowEmptyString('lft');
 
         $validator
             ->add('rght', 'valid', ['rule' => 'numeric'])
-            ->allowEmpty('rght');
+            ->allowEmptyString('rght');
 
         $validator
-            ->allowEmpty('description');
+            ->allowEmptyString('description');
 
         $validator
             ->requirePresence('nav', 'create')
-            ->notEmpty('nav');
+            ->notEmptyString('nav');
 
         $validator
             ->requirePresence('title', 'create')
-            ->notEmpty('title');
+            ->notEmptyString('title');
 
         $validator
-            ->allowEmpty('sidebar');
+            ->allowEmptyString('sidebar');
 
         $validator
             ->requirePresence('body', 'create')
-            ->notEmpty('body');
+            ->notEmptyString('body');
 
         $validator
             ->add('published', 'valid', ['rule' => 'boolean'])
             ->requirePresence('published', 'create')
-            ->notEmpty('published');
+            ->notEmptyString('published');
 
         return $validator;
     }

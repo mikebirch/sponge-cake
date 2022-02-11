@@ -1,7 +1,7 @@
 <?php
 namespace SpongeCake\Test\TestCase\Model\Table;
 
-use Cake\ORM\TableRegistry;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\TestSuite\TestCase;
 use SpongeCake\Model\Table\ContentsTable;
 
@@ -29,8 +29,8 @@ class ContentsTableTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        $config = TableRegistry::exists('Contents') ? [] : ['className' => 'SpongeCake\Model\Table\ContentsTable'];
-        $this->Contents = TableRegistry::get('Contents', $config);
+        $config = $this->getTableLocator->exists('Contents') ? [] : ['className' => 'SpongeCake\Model\Table\ContentsTable'];
+        $this->Contents = $this->getTableLocator->get('Contents', $config);
     }
 
     /**
