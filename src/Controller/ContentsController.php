@@ -104,6 +104,9 @@ class ContentsController extends AppController
         }
         $parents = $this->Contents->find('treeList', ['spacer' => '_', 'valuePath' => 'nav']);
         $this->set(compact('content', 'parents'));
+        if ($this->request->is('ajax')) {
+            $this->viewBuilder()->enableAutoLayout(false);
+        }
     }
 
     /**
@@ -129,6 +132,9 @@ class ContentsController extends AppController
         }
         $parents = $this->Contents->find('treeList', ['spacer' => '_', 'valuePath' => 'nav']);
         $this->set(compact('content', 'parents'));
+        if ($this->request->is('ajax')) {
+            $this->viewBuilder()->enableAutoLayout(false);
+        }
     }
 
     /**
