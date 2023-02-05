@@ -1,16 +1,15 @@
 <?php
+declare(strict_types=1);
+
 namespace SpongeCake\Model\Table;
 
 use Cake\ORM\Query;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
-use SpongeCake\Model\Entity\Content;
 use Cake\Event\Event;
 use Cake\ORM\Entity;
-//use Cake\Datasource\ConnectionManager;
 use Cake\Cache\Cache;
-use Cake\Log\Log;
 
 /**
  * Contents Model
@@ -28,7 +27,7 @@ class ContentsTable extends Table
      * @param array $config The configuration for the Table.
      * @return void
      */
-    public function initialize(array $config)
+    public function initialize(array $config): void
     {
         $this->setTable('contents');
         $this->getDisplayField('title');
@@ -52,7 +51,7 @@ class ContentsTable extends Table
      * @param \Cake\Validation\Validator $validator Validator instance.
      * @return \Cake\Validation\Validator
      */
-    public function validationDefault(Validator $validator)
+    public function validationDefault(Validator $validator): Validator
     {
         $validator
             ->add('id', 'valid', ['rule' => 'numeric'])
@@ -99,13 +98,19 @@ class ContentsTable extends Table
      * @param \Cake\ORM\RulesChecker $rules The rules object to be modified.
      * @return \Cake\ORM\RulesChecker
      */
-    public function buildRules(RulesChecker $rules)
+    public function buildRules(RulesChecker $rules): RulesChecker
     {
         $rules->add($rules->existsIn(['parent_id'], 'ParentContents'));
         return $rules;
     }
 
-
+    /**
+     * Get the page data and related data for parent and children
+     *
+     * @param \Cake\ORM\Query $query
+     * @param array $options
+     * @return void
+     */
     public function findPage(Query $query, array $options) {
         $query = $this->find()
             ->where(['Contents.path' => $options['path']])
@@ -116,34 +121,34 @@ class ContentsTable extends Table
         $query->cache(function ($q) use ($options){
             return 'contents-' . md5($options['path']);
         });
-        return $query->firstOrFail();;
+        return $query;
     }
 
+    /**
+     * Find breadcrumbs for a page
+     *
+     * @param \Cake\ORM\Query $query
+     * @param array $options
+     * @return \Cake\ORM\Query $query
+     */
     public function findBreadcrumbs(Query $query, array $options) {
-        $breadcrumbs = Cache::read($options['id'] . '_breadcrumbs');
-        $count_breadcrumbs = Cache::read($options['id'] . '_count_breadcrumbs');
-        if ($breadcrumbs === false || $count_breadcrumbs === false) {
-            $breadcrumbs = $this->find('path', ['for' => $options['id']]);
-            $crumbs = $breadcrumbs->toArray();
-            $count_breadcrumbs = $breadcrumbs->count();
-            Cache::write($options['id'] . '_breadcrumbs', $crumbs);
-            Cache::write($options['id'] . '_count_breadcrumbs', $count_breadcrumbs);
-        }
-        return [$breadcrumbs, $count_breadcrumbs];
+        $breadcrumbs = $this->find('path', ['for' => $options['id']]);
+        return $breadcrumbs;
     }
 
+    /**
+     * Find all the child pages of a page.
+     *
+     * @param \Cake\ORM\Query $query
+     * @param array $options
+     * @return \Cake\ORM\Query $query
+     */
     public function findAllchildren(Query $query, array $options) {
-
-        $children = Cache::read($options['id'] . '_children');
-        if ($children === false) {
-            $children = $this->find('children', ['for' => $options['id']])
-                ->find('threaded', [
-                    'fields' => ['id', 'slug', 'path', 'parent_id', 'nav', 'published', 'public'],
-                    'order' => 'lft ASC'
-                ])
-            ->toArray();
-            Cache::write($options['id'] . '_children', $children);
-        }
+        $children = $this->find('children', ['for' => $options['id']])
+            ->find('threaded', [
+                'fields' => ['id', 'slug', 'path', 'parent_id', 'nav', 'published', 'public'],
+                'order' => 'lft ASC'
+            ]);
         return $children;
     }
 
@@ -168,9 +173,9 @@ class ContentsTable extends Table
      */
     public function afterSave(Event $event, Entity $entity, $options)
     {
-        Cache::delete('contents-' .  md5($entity->path));
         if($entity->id != 1) { // don’t do anything when editing the home page
             if(!$entity->isNew()) { // only update when editing
+                Cache::delete('contents-' .  md5($entity->path));
                 $this->_updatePath($entity->id, $entity);
                 // update the path for child pages
                 $children = $this
@@ -196,15 +201,7 @@ class ContentsTable extends Table
      */
     public function findFullTreeList(Query $query, array $options)
     {
-        $results = $this->find('all', ['order' => 'lft ASC'])->toArray();
-        $stack = [];
-        foreach ($results as $i => $result) {
-            while ($stack && ($stack[count($stack) - 1] < $result->rght)) {
-                array_pop($stack);
-            }
-            $results[$i]->nav = str_repeat('&nbsp;&nbsp;&nbsp;',count($stack)).$results[$i]->nav;
-            $stack[] = $result->rght;
-        }
+        $results = $this->find('all', ['order' => 'lft ASC']);
         return $results;
     }
 

@@ -13,21 +13,22 @@ class ContentsRoute extends Route {
      * Checks to see if the given URL matches a path in the contents table.
      *
      * If the route can be parsed an array of parameters will be returned; if not
-     * false will be returned.
+     * null will be returned.
      *
      * @param string $url The URL to attempt to parse.
-     * @return array|bool Boolean false on failure, otherwise an array of parameters.
+     * @param string $method
+     * @return array|null null on failure, otherwise an array of parameters.
      */
-    public function parse($url, $method = '')
+    public function parse(string $url, string $method = ''): ?array
     {
 
         if($url != '/') {
             $url = rtrim($url,'/');
         }
 
-        $params = parent::parse($url);
+        $params = parent::parse($url, $method);
         if (!($params)) {
-            return false;
+            return null;
         }
 
         $pagesByPath = Cache::read('pagesByPath');
@@ -36,6 +37,8 @@ class ContentsRoute extends Route {
             $contents = $this->getTableLocator()->get('SpongeCake.Contents');
             $pagesByPath = $contents->cachePages(true);
         }
+        $contents = $this->getTableLocator()->get('SpongeCake.Contents');
+            $pagesByPath = $contents->cachePages(true);
 
         if (isset($pagesByPath[$url])) {
             $params['path'] = $url;
@@ -44,8 +47,6 @@ class ContentsRoute extends Route {
             return $params;
         }
 
-        return false;
-
+        return null;
     }
-
 }

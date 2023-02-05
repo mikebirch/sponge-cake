@@ -1,17 +1,16 @@
 <?php
+declare(strict_types=1);
+
 namespace SpongeCake\Controller;
 
 use SpongeCake\Controller\AppController;
-use Cake\Event\Event;
-use Cake\ORM\Locator\LocatorAwareTrait;
-use Cake\Cache\Cache;
-use Cake\Network\Session;
-use Cake\Http\Exception\NotFoundException;
+use Cake\Core\Plugin;
+use Cake\Datasource\Exception\RecordNotFoundException;
 
 /**
  * Contents Controller
  *
- * @property \SpongeCake\Model\Table\ContentsTable $Contents
+ * @method \SpongeCake\Model\Entity\ContentsTable[]|\Cake\Datasource\ResultSetInterface paginate($object = null, array $settings = [])
  */
 class ContentsController extends AppController
 {
@@ -21,28 +20,10 @@ class ContentsController extends AppController
      *
      * @return void
      */
-    public function initialize()
+    public function initialize(): void
     {
         parent::initialize();
         $this->loadComponent('RequestHandler');
-    }
-
-    /**
-     * If the action is "display", $this->request->getParam['pass']['public'] variable
-     * is checked to set $this->Auth->allow for "public" pages
-     *
-     * @param Event $event An Event instance
-     * @return void
-     */
-    public function beforeFilter(Event $event)
-    {
-        if($this->request->getParam('action') == 'display') {
-            // allow users to view pages only if the page is "public" or the user is logged in
-            if(($this->request->getParam('public') == true) || $this->Auth->user()) {
-                $this->Auth->allow(['display']);
-            }
-        }
-        parent::beforeFilter($event);
     }
 
     /**
@@ -53,32 +34,61 @@ class ContentsController extends AppController
 
     public function adminIndex()
     {
-        $contents = $this->Contents->find('fullTreeList');
-        $this->set('contents', $contents);
+        $query = $this->Contents->find('fullTreeList');
+        $results = $query->toArray();
+        $stack = [];
+        foreach ($results as $i => $result) {
+            while ($stack && ($stack[count($stack) - 1] < $result->rght)) {
+                array_pop($stack);
+            }
+            $results[$i]->nav = str_repeat('&nbsp;&nbsp;&nbsp;',count($stack)).$results[$i]->nav;
+            $stack[] = $result->rght;
+        }
+        $this->set('contents', $results);
     }
 
     /**
      * Display method
      *
      * @param string $path Content path.
-     * @return void
-     * @throws \Cake\Network\Exception\NotFoundException When the record is not published and
-     * the user doesn't have the admin role
+     * @return \Cake\Http\Response|null|void Renders view
+     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found or
+     * when the record is not published and the user doesn't have the admin role
      */
     public function display()
     {
-        if($this->request->getParam('published') == false) {
-            if($this->Auth->user('role') == 'admin') {
-                $this->Flash->error(__('This page is not published and can only be viewed by administrators.'));
-            } else {
-                throw new NotFoundException();
-            }
+        $query = $this->Contents->find('page', ['path' => $this->request->getParam('path')]);
+        $content = $query->first();
+        if ($content == null) {
+            throw new RecordNotFoundException();
         }
 
-        $content = $this->Contents->find('page', ['path' => $this->request->getParam('path')]);
-        list($breadcrumbs, $count_breadcrumbs) = $this->Contents->find('breadcrumbs', ['id' => $content->id]);
+        $user = $this->getRequest()->getAttribute('identity');
+        $admin = false;
+        if ($user) {
+            $admin = $this->getRequest()->getAttribute('identity')->role == 'admin';
+        }
 
-        $this->set(compact('content', 'breadcrumbs', 'count_breadcrumbs'));
+        if($this->request->getParam('published') == false) {
+            if($admin) {
+                $this->Flash->warning(__('This page is not published and can only be viewed by administrators.'));
+            } else {
+                throw new RecordNotFoundException();
+            }
+        } elseif ($this->request->getParam('public') == false && $admin == false) {
+            throw new RecordNotFoundException();
+        }
+
+        $breadcrumbs = $this->Contents->find('breadcrumbs', ['id' => $content->id]);
+        $crumbs = $breadcrumbs->toArray();
+        $count_breadcrumbs = $breadcrumbs->count();
+
+        $has_blog = false;
+        if (Plugin::loaded('CakephpSpongeBlog')) {
+            $has_blog = true;
+        }
+
+        $this->set(compact('content', 'crumbs', 'count_breadcrumbs', 'has_blog'));
         if($this->request->getParam('path') == '/') {
             $this->set('bodyclass', 'home');
         }
@@ -88,11 +98,11 @@ class ContentsController extends AppController
     /**
      * Add method
      *
-     * @return void Redirects on successful add, renders view otherwise.
+     * @return \Cake\Http\Response|null|void Redirects on successful add, renders view otherwise.
      */
     public function add()
     {
-        $content = $this->Contents->newEntity();
+        $content = $this->Contents->newEmptyEntity();
         if ($this->request->is('post')) {
             $content = $this->Contents->patchEntity($content, $this->request->getData());
             if ($this->Contents->save($content)) {
