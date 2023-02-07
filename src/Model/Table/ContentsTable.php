@@ -189,6 +189,8 @@ class ContentsTable extends Table
             }
             Cache::delete('pagesByPath');
             $this->cachePages();
+        } else {
+            Cache::delete('contents-' .  md5($entity->path));
         }
     }
 
