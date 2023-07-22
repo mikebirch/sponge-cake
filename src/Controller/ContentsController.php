@@ -83,12 +83,7 @@ class ContentsController extends AppController
         $crumbs = $breadcrumbs->toArray();
         $count_breadcrumbs = $breadcrumbs->count();
 
-        $has_blog = false;
-        if (Plugin::loaded('CakephpSpongeBlog')) {
-            $has_blog = true;
-        }
-
-        $this->set(compact('content', 'crumbs', 'count_breadcrumbs', 'has_blog'));
+        $this->set(compact('content', 'crumbs', 'count_breadcrumbs'));
         if($this->request->getParam('path') == '/') {
             $this->set('bodyclass', 'home');
         }
