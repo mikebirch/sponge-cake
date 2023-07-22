@@ -1,30 +1,41 @@
-# SpongeCake plugin for CakePHP 3
+# SpongeCake Plugin
 
-*Note: This plugin is currently in pre-alpha development and is unsupported.*
+SpongeCake is a CakePHP 4 plugin for managing content.
 
-SpongeCake is a CakePHP 3 plugin for managing content.
+SpongeCake can be used with the [sponge-admin](https://github.com/mikebirch/sponge-admin) admin theme.
 
-SpongeCake can be used with the [sponge-admin](https://github.com/mikebirch/sponge-admin) admin theme and the [cakephp-froala-upload](https://github.com/mikebirch/cakephp-froala-upload) plugin.
+## Requirements
+
+* CakePHP 4.4+
+* PHP 7.4+
 
 ## Routes
 
 Example routes.php
 
-use Cake\Core\Plugin;
-use Cake\Routing\Router;
-use Cake\Routing\Route\DashedRoute;
+```
+ $routes->scope('/', function (RouteBuilder $builder) {
 
-Router::defaultRouteClass(DashedRoute::class);
-
-// load plugin routes first, because SpongeCake has a route for '/*' which needs to load last.
-Plugin::routes();
-
-Router::scope('/', function ($routes) {
-    $routes->connect('/admin', ['controller' => 'Users', 'action' => 'dashboard']);
-    // use this route for all admin routes for SpongeCake
-    $routes->connect('/pages/:action/*', ['plugin' => 'SpongeCake', 'controller' => 'Contents']);
-    $routes->connect('/*', ['plugin' => 'SpongeCake', 'controller' => 'Contents', 'action' => 'display'], ['routeClass' => 'SpongeCake.ContentsRoute']);
-    $routes->fallbacks(DashedRoute::class);
-});
-
-
+        $builder->connect(
+            '/admin',
+            [
+                'plugin' => 'SpongeCake',
+                'controller' => 'Contents',
+                'action' => 'adminIndex']);
+        $builder->connect(
+            '/pages/{action}/*',
+            [
+                'plugin' => 'SpongeCake',
+                'controller' => 'Contents'
+            ]);
+        $builder->connect(
+            '/*',
+            [
+                'plugin' => 'SpongeCake',
+                'controller' => 'Contents',
+                'action' => 'display'
+            ],
+            ['routeClass' => 'SpongeCake.ContentsRoute']);
+         $builder->fallbacks();
+    });
+```
